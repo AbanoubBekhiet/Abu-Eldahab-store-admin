@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { Trash } from "lucide-react";
+import { Pencil, Trash } from "lucide-react";
 import { CardFooter } from "@/components/ui/card";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { deleteProduct } from "./productsApis";
 import { toast } from "react-toastify";
 import {
@@ -15,10 +15,43 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { useEffect, useRef, useState } from "react";
+import { fetchCategories } from "../categories/categoriesApis";
+import { useNavigate } from "react-router-dom";
+import ProductForm from "./ProductForm";
 
 function ProductCardFooter({ product }) {
-	const queryClient = useQueryClient();
+	const [isFormOpen, setIsFormOpen] = useState(false);
+	const formRef = useRef();
+	const navigate = useNavigate();
+	const {
+		data: categories,
+		isPending: isCategoriesPending,
+		isError,
+	} = useQuery({
+		queryKey: ["categories"],
+		queryFn: fetchCategories,
+	});
 
+	useEffect(() => {
+		const productForm = document.querySelector("#productForm");
+		const handleOutsideClick = (e) => {
+			if (
+				formRef.current &&
+				!productForm.contains(e.target) &&
+				formRef.current.contains(e.target)
+			) {
+				setIsFormOpen(false);
+			}
+		};
+
+		if (isFormOpen) {
+			document.addEventListener("mousedown", handleOutsideClick);
+		}
+
+		return () => document.removeEventListener("mousedown", handleOutsideClick);
+	}, [isFormOpen]);
+	const queryClient = useQueryClient();
 	const mutation = useMutation({
 		mutationFn: () => deleteProduct(product.id, product.image_url),
 		onSuccess: () => {
@@ -30,8 +63,21 @@ function ProductCardFooter({ product }) {
 		},
 	});
 
+	if (isCategoriesPending) {
+		return (
+			<div className="w-full h-[59vh] flex items-center justify-center">
+				<Spinner />
+			</div>
+		);
+	}
+
+	if (isError) {
+		navigate("/error");
+		return null;
+	}
+
 	return (
-		<CardFooter>
+		<CardFooter className="flex flex-wrap items-center justify-start  gap-1">
 			<AlertDialog>
 				<AlertDialogTrigger asChild>
 					<Button
@@ -64,6 +110,31 @@ function ProductCardFooter({ product }) {
 					</AlertDialogFooter>
 				</AlertDialogContent>
 			</AlertDialog>
+			<Button
+				variant="outline"
+				size="lg"
+				className="bg-[var(--color-one)] text-[var(--color-four)] text-1.5xl font-bold flex gap-2"
+				onClick={(e) => {
+					setIsFormOpen(true);
+					e.stopPropagation();
+				}}
+			>
+				تعديل
+				<Pencil />
+			</Button>
+			{isFormOpen && (
+				<div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 flex items-center justify-center">
+					<div ref={formRef} className="bg-white p-6 rounded-lg shadow-xl z-50">
+						<ProductForm
+							setIsFormOpen={setIsFormOpen}
+							categories={categories}
+							cardTitle="تعديل المنتج"
+							buttonTitle="تحديث المنتج"
+							productInfo={product}
+						/>
+					</div>
+				</div>
+			)}
 		</CardFooter>
 	);
 }

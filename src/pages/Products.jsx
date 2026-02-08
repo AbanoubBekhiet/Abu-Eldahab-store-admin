@@ -1,14 +1,13 @@
 import { Button } from "@/components/ui/button";
-import { getUser } from "@/features/auth/authApis";
 import { fetchCategories } from "@/features/categories/categoriesApis";
 import ProductForm from "@/features/products/ProductForm";
-import { fetchProducts, insertProduct } from "@/features/products/productsApis";
+import { fetchProducts } from "@/features/products/productsApis";
 import { ProductsFilter } from "@/features/products/ProductsFilter";
 import ProductsList from "@/features/products/ProductsList";
-import ProductsPagination from "@/features/products/ProductsPagination";
+import Pagination from "@/ui/Pagination";
 import Spinner from "@/ui/Spinner";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
 function Products() {
@@ -16,24 +15,24 @@ function Products() {
 	const [isFormOpen, setIsFormOpen] = useState(false);
 	const formRef = useRef();
 
-	useEffect(() => {
-		const productForm = document.querySelector("#productForm");
-		const handleOutsideClick = (e) => {
-			if (
-				formRef.current &&
-				!productForm.contains(e.target) &&
-				formRef.current.contains(e.target)
-			) {
-				setIsFormOpen(false);
-			}
-		};
+	// useEffect(() => {
+	// 	const handleOutsideClick = (e) => {
+	// 		console.log(e.currentTarget);
+	// 		if (
+	// 			formRef.current &&
+	// 			!formRef.current.contains(e.target)
+	// 		) {
+	// 			setIsFormOpen(false);
+	// 		}
+	// 	};
 
-		if (isFormOpen) {
-			document.addEventListener("mousedown", handleOutsideClick);
-		}
+	// 	if (isFormOpen) {
+	// 		document.addEventListener("mousedown", handleOutsideClick);
+	// 	}
 
-		return () => document.removeEventListener("mousedown", handleOutsideClick);
-	}, [isFormOpen]);
+	// 	return () => document.removeEventListener("mousedown", handleOutsideClick);
+	// }, [isFormOpen]);
+
 	const navigate = useNavigate();
 
 	const page = params.get("page") || 1;
@@ -68,7 +67,6 @@ function Products() {
 		return null;
 	}
 
-
 	return (
 		<main className="p-6 w-full">
 			<div className="w-full bg-[var(--color-three)] p-3 rounded-md ">
@@ -84,13 +82,15 @@ function Products() {
 			</div>
 			<ProductsFilter categories={categories} />
 			<ProductsList products={products} />
-			<ProductsPagination productsLength={products?.length || 0} />
+			<Pagination itemsLength={products?.length || 0} />
 			{isFormOpen && (
 				<div className="fixed inset-0 bg-black/20 backdrop-blur-sm z-40 flex items-center justify-center">
 					<div ref={formRef} className="bg-white p-6 rounded-lg shadow-xl z-50">
 						<ProductForm
 							setIsFormOpen={setIsFormOpen}
 							categories={categories}
+							cardTitle="إضافة منتج جديد"
+							buttonTitle="إضافة المنتج"
 						/>
 					</div>
 				</div>

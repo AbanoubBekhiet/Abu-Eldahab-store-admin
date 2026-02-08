@@ -22,60 +22,90 @@ export async function fetchProducts({ page, filter, search }) {
 	return products;
 }
 export async function insertProduct(product) {
+	let finalImageUrl = null;
+	const tempId = crypto.randomUUID();
+	if (product.image) {
+		const fileExtension = product.image.name.split(".").pop();
+		finalImageUrl = `${tempId}-${Date.now()}.${fileExtension}`;
+
+		const { error: uploadError } = await supabase.storage
+			.from("products_images")
+			.upload(finalImageUrl, product.image);
+
+		if (uploadError) {
+			throw new Error(`فشل رفع الصورة: ${uploadError.message}`);
+		}
+	}
+
 	const { data: insertedData, error: insertError } = await supabase
 		.from("products")
 		.insert([
 			{
+				id: tempId,
 				name: product.name,
 				number_of_pieces_in_packet: product.number_of_pieces_in_packet,
 				price_of_piece: product.price_of_piece,
 				price_of_packet: product.price_of_packet,
 				category_id: product.category,
+				image_url: finalImageUrl,
 			},
 		])
 		.select()
 		.single();
 
-	if (insertError) throw new Error(insertError.message);
+	if (insertError) {
+		if (finalImageUrl) {
+			await supabase.storage.from("products_images").remove([finalImageUrl]);
+		}
+		throw new Error(insertError.message);
+	}
 
-	const productRecord = insertedData;
-	let finalImageUrl = null;
+	return insertedData;
+}
+export async function updateProduct(product) {
+	let finalImageName = product.image;
 
-	if (product.image) {
+	if (product.image && typeof product.image !== "string") {
 		const fileExtension = product.image.name.split(".").pop();
-		const fileName = `${productRecord.id}.${fileExtension}`;
+		const newFileName = `${product.id}-${Date.now()}.${fileExtension}`;
+
+		const { data: oldProduct } = await supabase
+			.from("products")
+			.select("image_url")
+			.eq("id", product.id)
+			.single();
+
+		if (oldProduct?.image_url) {
+			await supabase.storage
+				.from("products_images")
+				.remove([oldProduct.image_url]);
+		}
 
 		const { error: uploadError } = await supabase.storage
 			.from("products_images")
-			.upload(fileName, product.image);
+			.upload(newFileName, product.image);
 
-		if (uploadError) {
-			throw new Error(`فشل رفع الصورة: ${uploadError.message}`);
-		}
+		if (uploadError) throw new Error(`خطأ في الرفع: ${uploadError.message}`);
 
-		finalImageUrl = fileName;
-
-		const { error: updateError } = await supabase
-			.from("products")
-			.update({ image_url: finalImageUrl })
-			.eq("id", productRecord.id);
-
-		if (updateError) throw new Error(updateError.message);
+		finalImageName = newFileName;
 	}
 
-	return productRecord;
-}
-export async function updateProduct(product) {
-	const { data: updatedProduct, error } = await supabase
+	const { data, error } = await supabase
 		.from("products")
-		.update({ other_column: "otherValue" })
-		.eq("some_column", "someValue")
-		.select();
+		.update({
+			name: product.name,
+			number_of_pieces_in_packet: product.number_of_pieces_in_packet,
+			price_of_piece: product.price_of_piece,
+			price_of_packet: product.price_of_packet,
+			category_id: product.category,
+			image_url: finalImageName,
+		})
+		.eq("id", product.id)
+		.select()
+		.single();
 
-	if (error) {
-		throw new Error(error.message);
-	}
-	return updatedProduct;
+	if (error) throw new Error(error.message);
+	return data;
 }
 export async function deleteProduct(product_id, image_url) {
 	const { error } = await supabase

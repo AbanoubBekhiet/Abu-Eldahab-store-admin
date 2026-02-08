@@ -16,7 +16,7 @@ export default function ProductCard({ product }) {
 				<img
 					src={
 						product?.image_url
-							? `${image_path}/${product.image_url.trim()}`
+							? `${image_path}/${product.image_url.trim()}?t=${new Date(product.updated_at).getTime()}`
 							: default_image
 					}
 					alt={product?.name ?? "Product image"}

@@ -3,11 +3,12 @@ import { useSearchParams } from "react-router-dom";
 
 const PAGE_LIMIT = 15;
 
-function ProductsPagination({ productsLength }) {
+function Pagination({ itemsLength }) {
 	const [params, setParams] = useSearchParams();
 	const currentPage = parseInt(params.get("page")) || 1;
+
 	function handleNextPage() {
-		if (productsLength < PAGE_LIMIT) return;
+		if (itemsLength < PAGE_LIMIT) return;
 		setParams((prev) => {
 			const newPage = Number(prev.get("page")) + 1;
 			prev.set("page", newPage);
@@ -40,7 +41,7 @@ function ProductsPagination({ productsLength }) {
 
 			<button
 				className="p-3 bg-[var(--color-one)] text-white rounded-full cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-				disabled={productsLength < PAGE_LIMIT}
+				disabled={itemsLength < PAGE_LIMIT}
 				onClick={handleNextPage}
 			>
 				<ChevronLeft size={24} />
@@ -49,4 +50,4 @@ function ProductsPagination({ productsLength }) {
 	);
 }
 
-export default ProductsPagination;
+export default Pagination;

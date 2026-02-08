@@ -29,7 +29,8 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { insertProduct } from "./productsApis";
+import { insertProduct, updateProduct } from "./productsApis";
+import { createPortal } from "react-dom";
 
 const formSchema = z.object({
 	name: z.string(),
@@ -42,13 +43,21 @@ const formSchema = z.object({
 	category: z.string().min(2, "اختر فئة المنتج"),
 	image: z.any().optional(),
 });
+const image_path =
+	"https://vyojzehexdatndltudup.supabase.co/storage/v1/object/public/products_images";
 
-export default function ProductForm({ setIsFormOpen, categories }) {
+export default function ProductForm({
+	setIsFormOpen,
+	categories,
+	buttonTitle,
+	cardTitle,
+	productInfo,
+}) {
 	const [preview, setPreview] = React.useState(null);
 	const fileInputRef = React.useRef(null);
 	const queryClient = useQueryClient();
 
-	const mutation = useMutation({
+	const mutationAdd = useMutation({
 		mutationFn: (data) => insertProduct(data),
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["products"] });
@@ -60,17 +69,36 @@ export default function ProductForm({ setIsFormOpen, categories }) {
 		},
 	});
 
+	const mutationUpdate = useMutation({
+		mutationFn: (data) => updateProduct(data),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["products"] });
+			toast.success("تم تعديل المنتج بنجاح");
+			setIsFormOpen(false);
+		},
+		onError: (error) => {
+			toast.error(`حدث خطأ: ${error.message}`);
+		},
+	});
+
 	const form = useForm({
 		resolver: zodResolver(formSchema),
 		defaultValues: {
-			name: "",
-			number_of_pieces_in_packet: 0,
-			price_of_piece: 0,
-			price_of_packet: 0,
-			category: "",
-			image: null,
+			name: productInfo ? productInfo.name : "",
+			number_of_pieces_in_packet: productInfo
+				? productInfo.number_of_pieces_in_packet
+				: 0,
+			price_of_piece: productInfo ? productInfo.price_of_piece : 0,
+			price_of_packet: productInfo ? productInfo.price_of_packet : 0,
+			category: productInfo ? productInfo.category_id : "",
+			image: productInfo ? productInfo.image_url : null,
 		},
 	});
+	React.useEffect(() => {
+		if (productInfo?.image_url) {
+			setPreview(`${image_path}/${productInfo.image_url}?t=${new Date(productInfo.updated_at).getTime()}`);
+		}
+	}, [productInfo]);
 
 	const handleImageChange = (e, onChange) => {
 		const file = e.target.files[0];
@@ -86,13 +114,18 @@ export default function ProductForm({ setIsFormOpen, categories }) {
 
 	async function onSubmit(data) {
 		try {
-			mutation.mutate(data);
+			if (productInfo) {
+				data.id = productInfo.id;
+				mutationUpdate.mutate(data);
+				return;
+			}
+			mutationAdd.mutate(data);
 		} catch (error) {
-			toast.error("حدث خطأ أثناء الحفظ");
+			toast.error(`حدث خطأ أثناء الحفظ,${error.message}`);
 		}
 	}
 
-	return (
+	return createPortal(
 		<div className="w-full h-screen bg-black/50 fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm p-4 overflow-y-auto">
 			<Card
 				className="w-full sm:max-w-md text-[var(--color-one)] relative my-auto shadow-2xl"
@@ -107,7 +140,7 @@ export default function ProductForm({ setIsFormOpen, categories }) {
 				</div>
 
 				<CardHeader className="pt-8 text-center">
-					<CardTitle className="text-2xl font-bold">إضافة منتج جديد</CardTitle>
+					<CardTitle className="text-2xl font-bold">{cardTitle}</CardTitle>
 				</CardHeader>
 
 				<CardContent className="max-h-[70vh] overflow-y-auto px-6">
@@ -300,10 +333,11 @@ export default function ProductForm({ setIsFormOpen, categories }) {
 					</Button>
 
 					<Button type="submit" form="product_form" className="flex-1">
-						حفظ المنتج
+						{buttonTitle}
 					</Button>
 				</CardFooter>
 			</Card>
-		</div>
+		</div>,
+		document.body,
 	);
 }
