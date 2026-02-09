@@ -1,7 +1,5 @@
-import { Button } from "@/components/ui/button";
 import {
 	Empty,
-	EmptyContent,
 	EmptyDescription,
 	EmptyHeader,
 	EmptyMedia,
@@ -9,7 +7,7 @@ import {
 } from "@/components/ui/empty";
 import { PackageSearch } from "lucide-react";
 
-export default function EmptyProducts() {
+export default function EmptyComponent() {
 	return (
 		<div className="flex h-[50vh]">
 			<Empty className="border border-dashed ">

@@ -1,11 +1,11 @@
 import ProductCard from "./ProductCard";
-import EmptyProducts from "../../ui/EmptyProducts";
+import EmptyComponent from "../../ui/EmptyComponent";
 
 function ProductsList({ products }) {
 	if (!products || products.length === 0) {
 		return (
 			<div className="flex items-center justify-center ">
-				<EmptyProducts />
+				<EmptyComponent />
 			</div>
 		);
 	}

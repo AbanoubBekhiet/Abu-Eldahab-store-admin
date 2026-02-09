@@ -21,16 +21,16 @@ function Footer() {
 				<p className="text-2xl">روابط سريعة</p>
 				<ul className=" [&>li:hover]:-translate-x-2 [&>li]:duration-300 ">
 					<li>
-						<Link to="/products">المنتجات</Link>
+						<Link to="/products?page=1">المنتجات</Link>
 					</li>
 					<li>
 						<Link to="/categories">الفئات</Link>
 					</li>
 					<li>
-						<Link to="/orders">الطلبات</Link>
+						<Link to="/orders?page=1">الطلبات</Link>
 					</li>
 					<li>
-						<Link to="/customers">العملاء</Link>
+						<Link to="/customers?page=1">العملاء</Link>
 					</li>
 				</ul>
 			</div>

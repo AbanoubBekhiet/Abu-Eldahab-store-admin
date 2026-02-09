@@ -17,7 +17,7 @@ function Header() {
 			</div>
 			<ul className="flex gap-4  ">
 				<li>
-					<Link to="/products" title="المنتجات">
+					<Link to="/products?page=1" title="المنتجات">
 						<PackageSearch className="text-[var(--color-one)] hover:text-[var(--color-four)] transition duration-700 ease-in-out" />
 					</Link>
 				</li>
@@ -27,12 +27,12 @@ function Header() {
 					</Link>
 				</li>
 				<li>
-					<Link to="/orders" title="الطلبات">
+					<Link to="/orders?page=1" title="الطلبات">
 						<Truck className="text-[var(--color-one)] hover:text-[var(--color-four)] transition duration-700 ease-in-out" />
 					</Link>
 				</li>
 				<li>
-					<Link to="/customers" title="العملاء">
+					<Link to="/customers?page=1" title="العملاء">
 						<FileUser className="text-[var(--color-one)] hover:text-[var(--color-four)] transition duration-700 ease-in-out" />
 					</Link>
 				</li>
