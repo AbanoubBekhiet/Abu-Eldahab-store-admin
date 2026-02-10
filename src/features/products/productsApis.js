@@ -48,6 +48,7 @@ export async function insertProduct(product) {
 				price_of_packet: product.price_of_packet,
 				category_id: product.category,
 				image_url: finalImageUrl,
+				accepts_pieces: product.accepts_pieces,
 			},
 		])
 		.select()
@@ -90,6 +91,7 @@ export async function updateProduct(product) {
 		finalImageName = newFileName;
 	}
 
+	console.log(product)
 	const { data, error } = await supabase
 		.from("products")
 		.update({
@@ -99,6 +101,7 @@ export async function updateProduct(product) {
 			price_of_packet: product.price_of_packet,
 			category_id: product.category,
 			image_url: finalImageName,
+			accepts_pieces: product.accepts_pieces,
 		})
 		.eq("id", product.id)
 		.select()

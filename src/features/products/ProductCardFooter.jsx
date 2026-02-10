@@ -83,7 +83,7 @@ function ProductCardFooter({ product }) {
 					<Button
 						variant="outline"
 						size="lg"
-						className="bg-[var(--color-one)] text-[var(--color-four)] text-1.5xl font-bold flex gap-2"
+						className="bg-red-500 text-[var(--color-four)] text-1.5xl font-bold flex gap-2"
 						disabled={mutation.isPending}
 					>
 						<Trash size={18} />
