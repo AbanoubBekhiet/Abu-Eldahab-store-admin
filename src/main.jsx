@@ -14,7 +14,6 @@ import { ToastContainer } from "react-toastify";
 import Error from "./pages/Error";
 import { Signin } from "./pages/SignIn";
 import AuthLayout from "./ui/AuthLayout";
-import { Analytics } from "@vercel/analytics/next";
 const queryClient = new QueryClient();
 createRoot(document.getElementById("root")).render(
 	<QueryClientProvider client={queryClient}>
@@ -46,7 +45,6 @@ createRoot(document.getElementById("root")).render(
 				pauseOnHover
 				theme="light"
 			/>
-			<Analytics />
 		</BrowserRouter>
 	</QueryClientProvider>,
 );
