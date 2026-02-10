@@ -1,7 +1,6 @@
-import { Button } from "@/components/ui/button";
 import { getCustomers } from "@/features/customers/customersApis";
+import { CustomersSearch } from "@/features/customers/CustomersSearch";
 import { CustomerTable } from "@/features/customers/CustomerTable";
-import ProductsList from "@/features/products/ProductsList";
 import Pagination from "@/ui/Pagination";
 import Spinner from "@/ui/Spinner";
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
@@ -39,9 +38,12 @@ function Customers() {
 	}
 
 	return (
-		<main className="p-6 w-full">
+		<main className="p-6 w-full min-h-[59vh] relative">
+			<CustomersSearch />
 			<CustomerTable customers={customers} />
-			<Pagination itemsLength={customers?.length || 0} />
+			<div className="absolute bottom-5 left-1/2 -translate-x-1/2">
+				<Pagination itemsLength={customers?.length || 0} />
+			</div>
 		</main>
 	);
 }

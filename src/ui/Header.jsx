@@ -1,7 +1,40 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import logo from "./../assets/logo.jpg";
-import { Boxes, FileUser, PackageSearch, Truck } from "lucide-react";
+import {
+	Boxes,
+	FileUser,
+	LogIn,
+	LogOut,
+	PackageSearch,
+	Truck,
+} from "lucide-react";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { getUser, signOut } from "@/features/auth/authApis";
+import { toast } from "react-toastify";
 function Header() {
+	const navigate = useNavigate();
+	const queryClient = useQueryClient();
+	const { data: user } = useQuery({
+		queryKey: ["userData"],
+		queryFn: getUser,
+	});
+
+	const { mutate: logoutMutation } = useMutation({
+		mutationFn: signOut,
+		onSuccess: () => {
+			queryClient.setQueryData(["userData"], null);
+			queryClient.invalidateQueries();
+
+			toast.success("تم تسجيل الخروج بنجاح");
+			navigate("/");
+		},
+		onError: (err) => {
+			toast.error(err.message);
+		},
+	});
+	function signOutUser() {
+		logoutMutation();
+	}
 	return (
 		<header className="bg-[var(--color-two)] p-8  flex items-center justify-between ">
 			<div className="flex items-center  gap-3">
@@ -36,23 +69,27 @@ function Header() {
 						<FileUser className="text-[var(--color-one)] hover:text-[var(--color-four)] transition duration-700 ease-in-out" />
 					</Link>
 				</li>
+				<li>
+					{user?.is_anonymous === false ? (
+						<button
+							onClick={signOutUser}
+							type="submit"
+							className="cursur-pointer text-red-400 hover:text-red-600 transition duration-700 ease-in-out"
+							title="تسجيل خروج"
+						>
+							<LogOut />
+						</button>
+					) : (
+						<Link
+							title="تسجيل دخول"
+							to="/sign-in"
+							className="text-[var(--color-one)] hover:text-[var(--color-four)] transition duration-700 ease-in-out flex items-center justify-center"
+						>
+							<LogIn />
+						</Link>
+					)}
+				</li>
 			</ul>
-			{/* <div className="flex gap-4 ">
-				<Link to="/profile/info" title="الملف الشخصي">
-					<CircleUserRound className="text-[var(--color-one)] hover:text-[var(--color-four)] transition duration-700 ease-in-out" />
-				</Link>
-				<Link to="/cart" title="سلة المشتريات">
-					<ShoppingCart className="text-[var(--color-one)] hover:text-[var(--color-four)] transition duration-700 ease-in-out" />
-				</Link>
-
-				<Link
-					title="تسجيل دخول"
-					to="/auth/signin"
-					className="text-[var(--color-one)] hover:text-[var(--color-four)] transition duration-700 ease-in-out flex items-center justify-center"
-				>
-					<LogIn />
-				</Link>
-			</div> */}
 		</header>
 	);
 }

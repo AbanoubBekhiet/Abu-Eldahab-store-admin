@@ -9,19 +9,20 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { signIn } from "@/features/auth/authApis";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 export function Signin() {
+	const queryClient = useQueryClient();
 	const navigate = useNavigate();
-
 	const mutation = useMutation({
 		mutationKey: ["sign-in"],
 		mutationFn: (credentials) => signIn(credentials),
 		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["userData"] });
+			navigate("/", { replace: true });
 			toast.success("تم تسجيل الدخول بنجاح");
-			navigate("/"); // تصحيح هنا
 		},
 		onError: (error) => {
 			toast.error(`فشل تسجيل الدخول: ${error.message}`);

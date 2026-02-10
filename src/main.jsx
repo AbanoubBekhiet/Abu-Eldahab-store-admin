@@ -13,17 +13,20 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { ToastContainer } from "react-toastify";
 import Error from "./pages/Error";
 import { Signin } from "./pages/SignIn";
+import AuthLayout from "./ui/AuthLayout";
 const queryClient = new QueryClient();
 createRoot(document.getElementById("root")).render(
 	<QueryClientProvider client={queryClient}>
 		<BrowserRouter>
 			<Routes>
 				<Route path="/" element={<Layout />}>
-					<Route index element={<App />} />
-					<Route path="/products" element={<Products />} />
-					<Route path="/orders" element={<Orders />} />
-					<Route path="/customers" element={<Customers />} />
-					<Route path="/categories" element={<Categories />} />
+					<Route element={<AuthLayout />}>
+						<Route index element={<App />} />
+						<Route path="/products" element={<Products />} />
+						<Route path="/orders" element={<Orders />} />
+						<Route path="/customers" element={<Customers />} />
+						<Route path="/categories" element={<Categories />} />
+					</Route>
 					<Route path="/error" element={<Error />} />
 					<Route path="/sign-in" element={<Signin />} />
 					<Route path="*" element={<NotFound />} />
