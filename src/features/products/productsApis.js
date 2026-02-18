@@ -91,7 +91,6 @@ export async function updateProduct(product) {
 		finalImageName = newFileName;
 	}
 
-	console.log(product)
 	const { data, error } = await supabase
 		.from("products")
 		.update({
@@ -123,4 +122,15 @@ export async function deleteProduct(product_id, image_url) {
 		throw new Error(error.message);
 	}
 	return null;
+}
+
+export async function updateProductAvailability(product_id, status) {
+	const { data, error } = await supabase
+		.from("products")
+		.update({ available: status })
+		.eq("id", product_id)
+		.select();
+
+	if (error) throw new Error(error.message);
+	return data;
 }
