@@ -17,7 +17,7 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { useEffect, useRef, useState } from "react";
+import {  useRef, useState } from "react";
 import { fetchCategories } from "../categories/categoriesApis";
 import { useNavigate } from "react-router-dom";
 import ProductForm from "./ProductForm";
@@ -54,7 +54,6 @@ function ProductCardFooter({ product }) {
 		},
 	});
 
-
 	const {
 		data: categories,
 		isPending: isCategoriesPending,
@@ -64,23 +63,11 @@ function ProductCardFooter({ product }) {
 		queryFn: fetchCategories,
 	});
 
-
 	const handleAvailabilityToggle = (checked) => {
 		availabilityMutation.mutate(checked);
 	};
 
-	useEffect(() => {
-		const handleOutsideClick = (e) => {
-			if (formRef.current && !formRef.current.contains(e.target)) {
-				setIsFormOpen(false);
-			}
-		};
 
-		if (isFormOpen) {
-			document.addEventListener("mousedown", handleOutsideClick);
-		}
-		return () => document.removeEventListener("mousedown", handleOutsideClick);
-	}, [isFormOpen]);
 
 	if (isCategoriesPending) {
 		return (
@@ -103,7 +90,7 @@ function ProductCardFooter({ product }) {
 			>
 				<Checkbox
 					id={`available-${product.id}`}
-					checked={product.available}s
+					checked={product.available}
 					onCheckedChange={handleAvailabilityToggle}
 					disabled={availabilityMutation.isPending}
 				/>
@@ -160,9 +147,13 @@ function ProductCardFooter({ product }) {
 			</div>
 
 			{isFormOpen && (
-				<div className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+				<div
+					onClick={() => setIsFormOpen(false)}
+					className="fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+				>
 					<div
 						ref={formRef}
+						onClick={(e) => e.stopPropagation()}
 						className="bg-white rounded-lg shadow-2xl w-full max-w-2xl overflow-hidden"
 					>
 						<ProductForm
