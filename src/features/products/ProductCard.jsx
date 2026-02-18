@@ -20,7 +20,7 @@ export default function ProductCard({ product }) {
 							: default_image
 					}
 					alt={product?.name ?? "Product image"}
-					className="z-20 aspect-video w-full object-cover brightness-80  "
+					className="z-20 aspect-video w-full object-contain brightness-80  "
 				/>
 			</div>
 			<CardHeader className="flex-1">
