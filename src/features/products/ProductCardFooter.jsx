@@ -17,7 +17,7 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {  useRef, useState } from "react";
+import { useRef, useState } from "react";
 import { fetchCategories } from "../categories/categoriesApis";
 import { useNavigate } from "react-router-dom";
 import ProductForm from "./ProductForm";
@@ -67,8 +67,6 @@ function ProductCardFooter({ product }) {
 		availabilityMutation.mutate(checked);
 	};
 
-
-
 	if (isCategoriesPending) {
 		return (
 			<div className="w-full flex items-center justify-center p-4">
@@ -102,7 +100,7 @@ function ProductCardFooter({ product }) {
 				</FieldLabel>
 			</Field>
 
-			<div className="flex items-center justify-between w-full mt-2">
+			<div className="flex items-center justify-center sm:justify-between w-full mt-2 flex-wrap sm:flex-nowrap">
 				<AlertDialog>
 					<AlertDialogTrigger asChild>
 						<Button
