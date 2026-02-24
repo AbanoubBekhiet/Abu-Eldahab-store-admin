@@ -14,10 +14,10 @@ export async function getCustomers({ page, search }) {
 		);
 	}
 
-	const {
-		data: profiles,
-		error,
-	} = await query.order("incre_id", { ascending: true }).range(from, to);
+	const { data: profiles, error } = await query
+		.order("incre_id", { ascending: true })
+		.range(from, to)
+		.eq("role", "customer");
 
 	if (error) throw new Error(error.message);
 	return { profiles };
