@@ -34,7 +34,7 @@ export async function getOrders({ page }) {
             )
         `,
 		)
-		.order("incre_id", { ascending: true })
+		.order("incre_id", { ascending: false })
 		.range(from, to);
 
 	if (error) throw new Error(error.message);
